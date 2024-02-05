@@ -1,50 +1,63 @@
-let elCards = document.querySelector(".cards");
-let elAddForm = document.querySelector(".addForm");
+let name=document.getElementById("name")
+let price=document.getElementById("price")
+let category=document.getElementById("category")
+let comment=document.getElementById("comment")
+let container=document.getElementById("container")
+let color=document.getElementById("ChangeColor")
+let exampleModal=document.getElementById("exampleModal")
+let data=[]
+let isActive=false;
+let editingIndex="";
+function HandleSave(){
+    let obj={
+        name:name.value,
+        price:price.value,
+        comment:comment.value,
+        category:category.value,
+        color:color.value
+    }
+    if(isActive==true){
+        data[editingIndex]=obj;  
+        isActive=false;
+    }
+    else{data.push(obj)}
+    Draw()
+    name.value=""
+    price.value=""
+    comment.value=""
+    color.value=""
+    category.value=""
 
-let products = JSON.parse(localStorage.getItem("products")) || [];
-
-elAddForm.addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  let product = {
-    name: e.target[0].value,
-    price: e.target[1].value,
-    img: e.target[2].value,
-  };
-
-  let obj = products.find((el) => el.name == product.name)
-
-  if(obj){
-    alert(`${product.name} allaqachon mavjud`)
-  } else {
-
-    products.push(product);
-
-    localStorage.setItem("products", JSON.stringify(products));
-
-    renderData(products)
-  }
-
-});
-
-function renderData(data) {
-    elCards.innerHTML = ""
-
-   data.forEach((el) => {
-    let card = document.createElement("div");
-    card.classList.add("card");
-    card.style.width = "18rem";
-
-    card.innerHTML += `
-    <img src=${el.img} class="card-img-top" alt=${el.name}>
-    <div class="card-body">
-      <h5 class="card-title">${el.name}</h5>
-      <p class="card-text">Narxi: ${el.price}</p>
-    </div>
-  `;
-
-    elCards.appendChild(card);
-  });
 }
-
-renderData(products)
+function deleteItem(index){
+    data.splice(index,1)
+    Draw()
+}
+function editItem(edit){
+    editingIndex=edit;
+    isActive=true;
+    name.value=data[edit].name;
+    price.value=data[edit].price;
+    comment.value=data[edit].comment;
+    category.value=data[edit].category;
+    color.value=data[edit].color;
+}
+function Draw(){
+    let s="";
+    for(let i=0;i<data.length;i++){
+        s+=`<div style='border:5px solid ${data[i].color}'>
+        <p>${i+1}</p>
+        <p>${data[i].name}</p>
+        <p>${data[i].price}</p>
+        <p>${data[i].comment}</p>
+        <p>${data[i].category}</p>
+        <p>
+        <button class="btn btn-danger" onclick="deleteItem(${i})">del</button>
+        <button type="button"  data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-success " onclick="editItem(${i})">edit</button>
+        </p>
+        
+        </div>`
+    }
+    container.innerHTML=s
+}
+Draw()
